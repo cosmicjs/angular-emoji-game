@@ -25,6 +25,7 @@
 
             'emoji',
             'admin',
+            'author',
             
             'config'
         ])

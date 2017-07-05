@@ -80,7 +80,7 @@
         <div class="thumbnail show-hide" ng-show="emojiCtrl.quote.author">
             <img ng-src="{{emojiCtrl.quote.author.metadata.photo.url}}">
             <div class="caption">
-                <h4 class="text-center"><a href="">{{emojiCtrl.quote.author.metadata.name}}</a></h4>
+                <h4 class="text-center"><a ui-sref="main.author({slug: emojiCtrl.quote.author.slug})">{{emojiCtrl.quote.author.metadata.name}}</a></h4>
             </div>
         </div>
     </div>

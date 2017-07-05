@@ -25,6 +25,7 @@
 
             'emoji',
             'admin',
+            'author',
             
             'config'
         ])
@@ -315,6 +316,60 @@
             };
         });  
 })();  
+(function () {
+    'use strict'; 
+
+    angular
+        .module('main')
+        .controller('AuthorCtrl', AuthorCtrl);
+
+    function AuthorCtrl($stateParams, $scope, Notification, AdminAuthorsService, Flash, $log) {
+        var vm = this;
+
+        vm.author = {};
+
+        getAuthor($stateParams.slug);
+
+        function getAuthor(slug) {
+            function success(response) {
+                response.data.object.metadata.born = new Date(response.data.object.metafields[2].value);
+                response.data.object.metadata.died = new Date(response.data.object.metafields[3].value);
+                vm.author = response.data.object;  
+            }
+
+            function failed(response) {
+                $log.error(response);
+            }
+
+            AdminAuthorsService
+                .getAuthorBySlug(slug)
+                .then(success, failed);
+        }
+    }
+})();
+
+(function () {
+    'use strict';
+
+    angular
+        .module('author', [])
+        .config(config);
+
+    config.$inject = ['$stateProvider', '$urlRouterProvider'];
+    function config($stateProvider, $urlRouterProvider) {
+
+        $stateProvider
+            .state('main.author', {
+                url: 'author/:slug',
+                templateUrl: '../views/author/author.html',
+                controller: 'AuthorCtrl as vm',
+                data: {
+                    is_granted: ['ROLE_GUEST']
+                }
+            });
+    }
+})();
+ 
 angular.module("config", [])
 .constant("BUCKET_SLUG", "emoji")
 .constant("URL", "https://api.cosmicjs.com/v1/")
@@ -331,7 +386,7 @@ angular.module("config", [])
         .module('main')
         .controller('EmojiCtrl', EmojiCtrl);
 
-    function EmojiCtrl($scope, $http, EmojiService, QuoteService, $log) {
+    function EmojiCtrl($scope, $http, EmojiService, AdminQuotesService, $log) {
         var vm = this;
 
         vm.checkAnswers = [];
@@ -457,7 +512,7 @@ angular.module("config", [])
                 $log.error(response);
             }
 
-            QuoteService
+            AdminQuotesService
                 .getQuotes(true)
                 .then(success, failed);
         }
@@ -481,14 +536,21 @@ angular.module("config", [])
                     vm.containers,
                     vm.checkAnswers
                 );
+
+                vm.emojis.sort(function(a, b) {
+                        return a.code.charCodeAt(1) - b.code.charCodeAt(2)
+                    });
+
+                vm.emojis.reverse();
+                console.log('emojis', vm.emojis);
             }
 
             function failed(response) {
                 $log.error(response);
             }
 
-            QuoteService
-                .getQuote(slug)
+            AdminQuotesService
+                .getQuoteBySlug(slug)
                 .then(success, failed);
         }
 
@@ -621,50 +683,15 @@ angular.module("config", [])
                         }
                     });
 
-                emojis.sort(function(a, b) {
-                    return a.code.charCodeAt(1) + b.code.charCodeAt(2)
-                });
-
-                emojis.reverse();
+                // emojis.sort(function(a, b) {
+                //     return a.code.charCodeAt(1) + b.code.charCodeAt(2)
+                // });
+                //
+                // emojis.reverse();
 
                 console.log(containers);
 
                 return _quote;
-            };
-
-        });
-})();  
-(function () {
-    'use strict';
-
-    angular
-        .module('main')
-        .service('QuoteService', function ($http,
-                                          $cookieStore, 
-                                          $q, 
-                                          $rootScope,
-                                          URL, BUCKET_SLUG, READ_KEY, WRITE_KEY, MEDIA_URL) {
-
-            $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-            var that = this;
-
-            that.getQuotes = function (ignoreLoadingBar) {
-                return $http.get(URL + BUCKET_SLUG + '/object-type/quotes', {
-                    ignoreLoadingBar: ignoreLoadingBar,
-                    params: {
-                        read_key: READ_KEY
-                    }
-                });
-            };
-
-            that.getQuote = function (slug, ignoreLoadingBar) {
-                return $http.get(URL + BUCKET_SLUG + '/object/' + slug, {
-                    ignoreLoadingBar: ignoreLoadingBar,
-                    params: {
-                        read_key: READ_KEY
-                    }
-                });
             };
 
         });

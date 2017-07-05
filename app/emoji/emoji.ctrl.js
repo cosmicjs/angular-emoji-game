@@ -5,7 +5,7 @@
         .module('main')
         .controller('EmojiCtrl', EmojiCtrl);
 
-    function EmojiCtrl($scope, $http, EmojiService, QuoteService, $log) {
+    function EmojiCtrl($scope, $http, EmojiService, AdminQuotesService, $log) {
         var vm = this;
 
         vm.checkAnswers = [];
@@ -131,7 +131,7 @@
                 $log.error(response);
             }
 
-            QuoteService
+            AdminQuotesService
                 .getQuotes(true)
                 .then(success, failed);
         }
@@ -155,14 +155,21 @@
                     vm.containers,
                     vm.checkAnswers
                 );
+
+                vm.emojis.sort(function(a, b) {
+                        return a.code.charCodeAt(1) - b.code.charCodeAt(2)
+                    });
+
+                vm.emojis.reverse();
+                console.log('emojis', vm.emojis);
             }
 
             function failed(response) {
                 $log.error(response);
             }
 
-            QuoteService
-                .getQuote(slug)
+            AdminQuotesService
+                .getQuoteBySlug(slug)
                 .then(success, failed);
         }
 

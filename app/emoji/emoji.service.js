@@ -99,11 +99,11 @@
                         }
                     });
 
-                emojis.sort(function(a, b) {
-                    return a.code.charCodeAt(1) + b.code.charCodeAt(2)
-                });
-
-                emojis.reverse();
+                // emojis.sort(function(a, b) {
+                //     return a.code.charCodeAt(1) + b.code.charCodeAt(2)
+                // });
+                //
+                // emojis.reverse();
 
                 console.log(containers);
 
