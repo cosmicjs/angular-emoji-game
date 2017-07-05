@@ -56,7 +56,7 @@
                 case 'ROLE_ADMIN':
                     state = 'admin.authors';
                     break;
-                default : state = 'main.emoji';
+                default : state = 'main.emoji'; 
             }
 
             if (state) $state.go(state);
