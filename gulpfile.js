@@ -33,7 +33,7 @@ gulp.task('config', function () {
         URL: 'https://api.cosmicjs.com/v1/',
         READ_KEY: process.env.COSMIC_READ_KEY || '',
         WRITE_KEY: process.env.COSMIC_WRITE_KEY || '',
-        STRIPE_KEY: process.env.STRIPE_KEY || ''
+        DEFAULT_IMAGE: process.env.DEFAULT_IMAGE || ''
     });
     return b2v.stream(new Buffer(json), 'config.js')
         .pipe(gulpNgConfig('config'))
