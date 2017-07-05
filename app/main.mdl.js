@@ -54,7 +54,7 @@
             
             switch (crAcl.getRole()) {
                 case 'ROLE_ADMIN':
-                    state = 'admin.emoji';
+                    state = 'admin.authors';
                     break;
                 default : state = 'main.emoji';
             }
