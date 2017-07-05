@@ -5,10 +5,12 @@
         .module('main')
         .controller('AuthorCtrl', AuthorCtrl);
 
-    function AuthorCtrl($stateParams, $scope, Notification, AdminAuthorsService, Flash, $log) {
+    function AuthorCtrl($stateParams, $scope, DEFAULT_IMAGE, AdminAuthorsService, Flash, $log) {
         var vm = this;
 
         vm.author = {};
+        
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
         getAuthor($stateParams.slug);
 

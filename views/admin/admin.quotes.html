@@ -10,7 +10,7 @@
             <tr ng-repeat="quote in vm.quotes">
                 <td>{{$index + 1}}</td>
                 <td><a ui-sref="admin.quotes.edit({slug: quote.slug})">{{quote.metadata.text}}</a></td>
-                <td><a ui-sref="admin.authors.edit({slug: quote.metadata.author.slug})">{{quote.metadata.author.metadata.name}}</a></td>
+                <td><a ui-sref="main.author({slug: quote.metadata.author.slug})">{{quote.metadata.author.metadata.name}}</a></td>
                 <td>
                     <button class="btn btn-default btn-sm" ng-click="vm.removeQuote(quote.slug)"><i class="fa fa-remove"></i></button>
                 </td>

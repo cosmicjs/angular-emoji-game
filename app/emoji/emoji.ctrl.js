@@ -5,15 +5,17 @@
         .module('main')
         .controller('EmojiCtrl', EmojiCtrl);
 
-    function EmojiCtrl($scope, $http, EmojiService, AdminQuotesService, $log) {
+    function EmojiCtrl($scope, DEFAULT_IMAGE, EmojiService, AdminQuotesService, $log) {
         var vm = this;
 
         vm.checkAnswers = [];
-        vm.quote = {};
+        vm.quote = {}; 
         vm.quotes = [];
         vm.emojis = [];
         vm.containers = [];
         vm.win = false;
+
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
         var random = EmojiService.Random;
         var getEmojisFromWords = EmojiService.getEmojisFromWords;

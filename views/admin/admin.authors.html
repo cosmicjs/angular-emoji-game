@@ -12,7 +12,8 @@
                 <td>{{$index + 1}}</td>
                 <td>
                     <div class="img-author">
-                        <img ng-show="author.metadata.photo.url" ng-src="{{author.metadata.photo.url}}" width="50">
+                        <img ng-show="author.metafields[1].value" ng-src="{{author.metadata.photo.url}}" width="50">
+                        <img ng-show="!author.metafields[1].value" ng-src="{{vm.DEFAULT_IMAGE}}" width="50">
                     </div>
                 </td>
                 <td><a ui-sref="admin.authors.edit({slug: author.slug})">{{author.metadata.name}}</a></td>

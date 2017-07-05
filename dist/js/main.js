@@ -143,68 +143,6 @@
 
     angular
         .module('main')
-        .controller('AdminCtrl', UserCtrl);
-
-    function UserCtrl($rootScope, $scope, $state, AuthService, Flash, $log) {
-        var vm = this;
-        
-        vm.currentUser = $rootScope.globals.currentUser.metadata;
-        
-        vm.logout = logout;
-
-        function logout() {
-            function success(response) {
-                $state.go('auth');
-
-                $log.info(response);
-            }
-
-            function failed(response) {
-                $log.error(response);
-            }
-
-            AuthService
-                .clearCredentials()
-                .then(success, failed);
-        }
-
-        $scope.state = $state;
-
-    }
-})();
-
-(function () {
-    'use strict';
-
-    angular
-        .module('admin', [
-            'admin.quotes',
-            'admin.authors'
-        ])
-        .config(config);
-
-    config.$inject = ['$stateProvider', '$urlRouterProvider'];
-    function config($stateProvider, $urlRouterProvider) {
-
-        $stateProvider
-            .state('admin', {
-                url: '/admin/',
-                abstract: true,
-                templateUrl: '../views/admin/admin.html',
-                controller: 'AdminCtrl',
-                data: {
-                    is_granted: ['ROLE_ADMIN']
-                }
-            });
-    }
-
-})();
- 
-(function () {
-    'use strict'; 
-
-    angular
-        .module('main')
         .controller('AuthCtrl', AuthCtrl);
 
     function AuthCtrl(crAcl, $state, AuthService, Flash, $log) {
@@ -321,12 +259,76 @@
 
     angular
         .module('main')
+        .controller('AdminCtrl', UserCtrl);
+
+    function UserCtrl($rootScope, $scope, $state, AuthService, Flash, $log) {
+        var vm = this;
+        
+        vm.currentUser = $rootScope.globals.currentUser.metadata;
+        
+        vm.logout = logout;
+
+        function logout() {
+            function success(response) {
+                $state.go('auth');
+
+                $log.info(response);
+            }
+
+            function failed(response) {
+                $log.error(response);
+            }
+
+            AuthService
+                .clearCredentials()
+                .then(success, failed);
+        }
+
+        $scope.state = $state;
+
+    }
+})();
+
+(function () {
+    'use strict';
+
+    angular
+        .module('admin', [
+            'admin.quotes',
+            'admin.authors'
+        ])
+        .config(config);
+
+    config.$inject = ['$stateProvider', '$urlRouterProvider'];
+    function config($stateProvider, $urlRouterProvider) {
+
+        $stateProvider
+            .state('admin', {
+                url: '/admin/',
+                abstract: true,
+                templateUrl: '../views/admin/admin.html',
+                controller: 'AdminCtrl',
+                data: {
+                    is_granted: ['ROLE_ADMIN']
+                }
+            });
+    }
+
+})();
+ 
+(function () {
+    'use strict'; 
+
+    angular
+        .module('main')
         .controller('AuthorCtrl', AuthorCtrl);
 
-    function AuthorCtrl($stateParams, $scope, Notification, AdminAuthorsService, Flash, $log) {
+    function AuthorCtrl($stateParams, $scope, DEFAULT_IMAGE, AdminAuthorsService, Flash, $log) {
         var vm = this;
 
         vm.author = {};
+        
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
         getAuthor($stateParams.slug);
 
@@ -386,15 +388,17 @@ angular.module("config", [])
         .module('main')
         .controller('EmojiCtrl', EmojiCtrl);
 
-    function EmojiCtrl($scope, $http, EmojiService, AdminQuotesService, $log) {
+    function EmojiCtrl($scope, DEFAULT_IMAGE, EmojiService, AdminQuotesService, $log) {
         var vm = this;
 
         vm.checkAnswers = [];
-        vm.quote = {};
+        vm.quote = {}; 
         vm.quotes = [];
         vm.emojis = [];
         vm.containers = [];
         vm.win = false;
+
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
         var random = EmojiService.Random;
         var getEmojisFromWords = EmojiService.getEmojisFromWords;
@@ -737,15 +741,17 @@ angular.module("config", [])
 (function () {
     'use strict'; 
 
-    angular
+    angular 
         .module('main')
         .controller('AdminAuthorsCtrl', AdminAuthorsCtrl);
 
-    function AdminAuthorsCtrl($rootScope, $scope, Notification, AdminAuthorsService, Flash, $log) {
+    function AdminAuthorsCtrl($rootScope, DEFAULT_IMAGE, Notification, AdminAuthorsService, Flash, $log) {
         var vm = this;
 
         vm.getAuthors = getAuthors; 
         vm.removeAuthor = removeAuthor;
+        
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
         vm.authors = [];
 
@@ -1190,7 +1196,7 @@ angular.module("config", [])
                             };
 
                             ngDialog.open(options).closePromise.finally(function () {
-                                $state.go('admin.authors');
+                                $state.go('admin.authors', {}, {reload: true});
                             });
                         }
                     }]
@@ -1336,7 +1342,7 @@ angular.module("config", [])
                             };
 
                             ngDialog.open(options).closePromise.finally(function () {
-                                $state.go('admin.authors');
+                                $state.go('admin.authors', {}, {reload: true});
                             });
                         }
                     }]

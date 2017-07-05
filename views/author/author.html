@@ -1,9 +1,10 @@
 <div class="row">
     <div class="col-xs-12 col-md-10" ng-bind-html="vm.author.content">
     </div>
-    <div class="col-xs-2">
-        <div class="thumbnail show-hide" ng-show="vm.author.content">
-            <img ng-src="{{vm.author.metadata.photo.url}}">
+    <div class="col-xs-offset-3 col-xs-6 col-md-offset-0 col-md-2">
+        <div class="thumbnail show-hide" ng-show="vm.author.metadata">
+            <img ng-show="vm.author.metafields[1].value" ng-src="{{vm.author.metadata.photo.url}}">
+            <img ng-show="!vm.author.metafields[1].value" ng-src="{{vm.DEFAULT_IMAGE}}">
             <div class="caption">
                 <h4 class="text-center">{{vm.author.metadata.name}}</h4>
                 <h6 class="text-center">{{vm.author.metadata.born | date}} - {{vm.author.metadata.died | date}}</h6>

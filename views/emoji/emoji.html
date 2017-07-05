@@ -78,7 +78,9 @@
     </div>
     <div class="col-xs-2 hidden-xs">
         <div class="thumbnail show-hide" ng-show="emojiCtrl.quote.author">
-            <img ng-src="{{emojiCtrl.quote.author.metadata.photo.url}}">
+            <img ng-show="emojiCtrl.quote.author.metafields[1].value" ng-src="{{emojiCtrl.quote.author.metadata.photo.url}}">
+            <img ng-show="!emojiCtrl.quote.author.metafields[1].value" ng-src="{{emojiCtrl.DEFAULT_IMAGE}}">
+
             <div class="caption">
                 <h4 class="text-center"><a ui-sref="main.author({slug: emojiCtrl.quote.author.slug})">{{emojiCtrl.quote.author.metadata.name}}</a></h4>
             </div>

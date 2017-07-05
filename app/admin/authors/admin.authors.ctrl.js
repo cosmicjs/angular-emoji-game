@@ -1,15 +1,17 @@
 (function () {
     'use strict'; 
 
-    angular
+    angular 
         .module('main')
         .controller('AdminAuthorsCtrl', AdminAuthorsCtrl);
 
-    function AdminAuthorsCtrl($rootScope, $scope, Notification, AdminAuthorsService, Flash, $log) {
+    function AdminAuthorsCtrl($rootScope, DEFAULT_IMAGE, Notification, AdminAuthorsService, Flash, $log) {
         var vm = this;
 
         vm.getAuthors = getAuthors; 
         vm.removeAuthor = removeAuthor;
+        
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
         vm.authors = [];
 

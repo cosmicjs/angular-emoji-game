@@ -33,7 +33,7 @@
                             };
 
                             ngDialog.open(options).closePromise.finally(function () {
-                                $state.go('admin.authors');
+                                $state.go('admin.authors', {}, {reload: true});
                             });
                         }
                     }]

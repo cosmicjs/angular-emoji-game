@@ -6,8 +6,8 @@
                  flow-name="vm.flow">
                 <div class="col-sm-6">
                     <div class="thumbnail">
-                        <img ng-if="!vm.flow.files.length" ng-src="{{ngDialogData.metafields[1].url}}">
-                        <img ng-if="!vm.flow.files.length && !ngDialogData.metafields[1].url" ng-src="{{vm.DEFAULT_IMAGE}}">
+                        <img ng-if="!vm.flow.files.length  && ngDialogData.metafields[1].value" ng-src="{{ngDialogData.metafields[1].url}}">
+                        <img ng-if="!vm.flow.files.length && !ngDialogData.metafields[1].value" ng-src="{{vm.DEFAULT_IMAGE}}">
                         <img ng-if="vm.flow.files.length" flow-img="vm.flow.files[0]">
                     </div>
                 </div>
