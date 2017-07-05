@@ -1,0 +1,87 @@
+<div class="row">
+    <!--<div class="col-md-1 hidden-md">-->
+        <!--<div class="quot-img"><img src="/dist/img/quotes.png" alt="image"></div>-->
+    <!--</div>-->
+    <div class="col-xs-12 col-md-10">
+        <div class="text-sect show-hide-05" ng-show="emojiCtrl.containers.length">
+            <div class="row">
+                <div class="win show-hide" ng-show="emojiCtrl.win">
+                    <div class="row text-center win-text"><br>You won!</div>
+                    <div class="row">
+                       <div class="col-xs-12 text-right">
+                           <button class="btn btn-default btn-lg"
+                                   ng-click="emojiCtrl.nextQuote()">Next
+                           </button>
+                       </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <ul class="emoji-container">
+                        <li ng-repeat="container in emojiCtrl.containers track by $index">
+                            <div ng-if="container.type === 'word'" ng-bind="container.item"
+                                 style="margin-top: 15px; margin-bottom: 15px;"></div>
+                            <div ng-if="container.type === 'emoji'" class="emoji-container-drop" data-drop="true"
+                                 ng-model='container.item'
+                                 data-jqyoui-options="getOptionsContainer(container.item)"
+                                 jqyoui-droppable="{revert: 'invalid'}">
+                                <div class="caption">
+                                    <div class="emoji" ng-repeat="item in container.item" ng-show="item.code"
+                                         data-drag="true"
+                                         data-jqyoui-options="{multiple: false, revert: 'invalid', placeholder:true,animate:true}"
+                                         ng-model="container.item"
+                                         jqyoui-draggable="{index: {{$index}}}">
+                                        <div class="emoji-icon"
+                                             ng-bind-html="item.code | emoticons:{linkTarget:'_blank'}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-8">
+                    <ul class="emoji-container">
+                        <li class="emoji-variant-container btn-draggable" ng-repeat="item in emojiCtrl.emojis"
+                            data-drop="true"
+                            ng-model='emojiCtrl.emojis'
+                            jqyoui-droppable="{index: {{$index}}}" class="emoji" data-drag="true"
+                            data-jqyoui-options="{revert: 'invalid'}" ng-model="emojiCtrl.emojis"
+                            jqyoui-draggable="{index: {{$index}},placeholder:true,animate:true}"
+                            ng-hide="!item.code" ng-click>
+                            <div >
+                                <div class="emoji-icon"
+                                     ng-bind-html="item.code | emoticons:{linkTarget:'_blank'}"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4 text-right">
+                    <button class="btn btn-success btn-lg"
+                            ng-class="{'disabled': emojiCtrl.getUserAnswerLength() !== emojiCtrl.checkAnswers.length}"
+                            ng-click="emojiCtrl.checkAnswer()">Check
+                    </button>
+                    <button class="btn btn-default btn-lg"
+                            ng-click="emojiCtrl.nextQuote()">Next
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="row">
+
+           </div>
+
+        </div>
+    </div>
+    <div class="col-xs-2 hidden-xs">
+        <div class="thumbnail show-hide" ng-show="emojiCtrl.quote.author">
+            <img ng-src="{{emojiCtrl.quote.author.metadata.photo.url}}">
+            <div class="caption">
+                <h4 class="text-center"><a href="">{{emojiCtrl.quote.author.metadata.name}}</a></h4>
+            </div>
+        </div>
+    </div>
+</div>
