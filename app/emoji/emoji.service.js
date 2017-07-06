@@ -3,17 +3,11 @@
 
     angular
         .module('main')
-        .service('EmojiService', function ($http,
-                                          $cookieStore, 
-                                          $q, 
-                                          $rootScope,
-                                          URL, BUCKET_SLUG, READ_KEY, WRITE_KEY, MEDIA_URL) {
-            
-            $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+        .service('EmojiService', function ($http) {
             
             var that = this;
 
-            that.Quote = function (text, author, slug) {
+            that.Quote = function (text, author, slug) { 
                 this.text = text;
                 this.author = author;
                 this.slug = slug;
@@ -22,10 +16,6 @@
             that.Emoji = function (code, position) {
                 this.code = code;
                 this.position = position;
-
-                this.getEmoji = function () {
-                    console.log('asc');
-                }
             };
 
             that.Container = function (type, item) {
@@ -98,14 +88,6 @@
                             emojis.push(new that.Emoji(":" + data[parseInt(Math.random() * data.length)] + ":"));
                         }
                     });
-
-                // emojis.sort(function(a, b) {
-                //     return a.code.charCodeAt(1) + b.code.charCodeAt(2)
-                // });
-                //
-                // emojis.reverse();
-
-                console.log(containers);
 
                 return _quote;
             };

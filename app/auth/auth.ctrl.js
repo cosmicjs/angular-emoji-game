@@ -10,8 +10,6 @@
 
         vm.login = login;
         
-        vm.showRegisterForm = false;
-        
         vm.loginForm = null;
         
         vm.credentials = {};

@@ -2,32 +2,32 @@
     <div class="row">
         <div class="col-md-offset-2 col-md-8">
             <h2>
-                How to Build an Ecommerce App Using AngularJS
+                How to Build an Emoji App Using AngularJS
             </h2>
             <hr>
             <img src="/dist/img/for-blog.png" class="img-responsive">
             <br>
             <p>
-                In this tutorial I'm going to show you how to create a "Ecommerce" app using a little bit of Node, and Cosmic JS. For the sake of understanding how to consume Restful API’s, this tutorial will show how to make simple AJAX requests to the Cosmic JS API in order to retrieve, update, and delete data in our Cosmic JS buckets. Let's get started.
+                In this tutorial I'm going to show you how to create a "Emoji" app using a little bit of Node, and Cosmic JS. For the sake of understanding how to consume Restful API’s, this tutorial will show how to make simple AJAX requests to the Cosmic JS API in order to retrieve, update, and delete data in our Cosmic JS buckets. Let's get started.
             </p>
             <h2>TL;DR</h2>
             <p>
-                <a href="https://github.com/kutsaniuk/ecommerce-app">Download the GitHub repo.</a><br>
-                <a href="http://ecommerce.cosmicapp.co">Check out the demo.</a>
+                <a href="https://github.com/kutsaniuk/emoji-app">Download the GitHub repo.</a><br>
+                <a href="http://emoji.cosmicapp.co">Check out the demo.</a>
             </p>
             <h2>Getting Started:</h2>
             <p>
                 First, let’s make a new directory to build our project in and lets also make a package.json file.
             </p>
-            <pre>mkdir ecommerce-app</pre>
-            <pre>ecommerce-app$ touch package.json</pre>
+            <pre>mkdir emoji-app</pre>
+            <pre>emoji-app$ touch package.json</pre>
             <p>
                 Now, in your package.json, copy and paste the code below:
             </p>
             <pre>
-//ecommerce-app/package.json
+//emoji-app/package.json
 {
-  "name": "ecommerce-app",
+  "name": "emoji-app",
   "version": "1.0.0",
   "main": "app-server.js",
   "engines": {
@@ -36,20 +36,22 @@
   },
   "description": "",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "bower": "^1.7.7",
+    "buffer-to-vinyl": "^1.1.0",
     "express": "^4.13.3",
     "gulp": "^3.9.1",
-    "buffer-to-vinyl": "^1.1.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-concat": "^2.6.0",
     "gulp-concat-css": "^2.2.0",
+    "gulp-env": "^0.4.0",
     "gulp-minify-css": "^1.2.4",
     "gulp-ng-config": "^1.4.0",
-    "gulp-env": "^0.4.0",
+    "gulp-npm-script-sync": "^1.1.0",
     "gulp-webserver": "^0.9.1",
     "http-server": "^0.9.0",
-    "wiredep": "^3.0.0",
-    "gulp-npm-script-sync": "^1.1.0"
+    "stripe": "^4.22.0",
+    "wiredep": "^3.0.0"
   },
   "scripts": {
     "postinstall": "bower install && gulp config && gulp js",
@@ -63,33 +65,33 @@
     "gulp-npm-script-sync": "^1.1.0",
     "gulp-remote-src": "^0.4.2"
   }
-}
+}/
             </pre>
             <p>
                 Second, let’s make a bower.json file.
             </p>
-            <pre>ecommerce-app$ touch bower.json</pre>
+            <pre>emoji-app$ touch bower.json</pre>
             <p>
                 Now, in your bower.json, copy and paste the code below:
             </p>
             <pre>
-//ecommerce-app/bower.json
+//emoji-app/bower.json
 {
-  "name": "ecommerce-app",
-  "description": "Ecommerce App",
+  "name": "emoji-app",
+  "description": "Emoji App",
   "version": "0.0.0",
-  "homepage": "https://github.com/kutsaniuk/ecommerce-app",
+  "homepage": "https://github.com/kutsaniuk/emoji-app",
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "angular": "~1.4.x",
-    "angular-mocks": "~1.4.x",
+    "angular": "~1.5.x",
+    "angular-mocks": "~1.5.x",
     "angular-bootstrap": "~1.1.x",
-    "angular-cookies": "~1.4.x",
-    "angular-route": "~1.4.x",
+    "angular-cookies": "~1.5.x",
+    "angular-route": "~1.5.x",
     "angular-ui-router": "0.2.x",
-    "angular-resource": "1.4.x",
-    "angular-animate": "~1.4.x",
+    "angular-resource": "1.5.x",
+    "angular-animate": "~1.5.x",
     "ng-dialog": "0.6.1",
     "bootstrap": "3.3.x",
     "cr-acl": "",
@@ -103,17 +105,20 @@
     "angular-ui-switch": "^0.1.1",
     "ng-scrollbars": "^0.0.11",
     "jquery.scrollbar": "*",
-    "angular-nvd3": "*",
-    "infinity-angular-chosen": "^0.2.0",
     "angular-flash-alert": "^2.4.0",
     "components-font-awesome": "^4.7.0",
-    "textAngular": "^1.5.16",
     "angular-loading-bar": "^0.9.0",
     "angular-environment": "^1.0.8",
-    "angular-sticky": "angular-sticky-plugin#^0.3.0"
+    "angular-emoji-popup": "",
+    "angular-dragdrop": "",
+    "angular-sanitize": "1.5.*",
+    "angular-drag-and-drop-directives": "",
+    "jquery-ui-touch-punch": "",
+    "angular-touch":"1.5.*",
+    "textAngular":"1.5.*"
   },
   "resolutions": {
-    "angular": "~1.4.x"
+    "angular": "~1.5.x"
   },
   "devDependencies": {
     "cr-acl": "^0.5.0"
@@ -123,19 +128,22 @@
             <p>
                 Config app server:
             </p>
-            <pre>ecommerce-app$ touch app-server.js</pre>
+            <pre>emoji-app$ touch app-server.js</pre>
             <pre>
 //events-app/app-server.js
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 app.set('port', process.env.PORT || 3000)
 app.use(express.static(__dirname))
+app.use(bodyParser.json())
 var http = require('http').Server(app)
+// Route
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 })
 http.listen(app.get('port'), () => {
-  console.log('Ecommerce App listening on ' + app.get('port'))
+  console.log('Emoji App listening on ' + app.get('port'))
 })
             </pre>
             <h2>What we're installing and why:</h2>
@@ -146,10 +154,10 @@ http.listen(app.get('port'), () => {
             </ol>
             <h2>Building our app:</h2>
             <p>
-                Now we're going to build out our file structure a bit more so that we can organize our angular modules and js files. This is what our ecommerce-app directory should look like:
+                Now we're going to build out our file structure a bit more so that we can organize our angular modules and js files. This is what our emoji-app directory should look like:
             </p>
             <pre>
-ecommerce-app
+emoji-app
 |----app
 |       |----auth
 |                 |----auth.ctrl.js
@@ -164,28 +172,35 @@ ecommerce-app
 |                 |----watch.mdl.js
 |                 |----watch.service.js
 |       |----admin
-|                 |----orders
-|                           |----preview
-|                                   |----admin.orders.preview.mdl.js
-|                           |----admin.orders.ctrl.js
-|                           |----admin.orders.mdl.js
-|                           |----admin.orders.service.js
-|                 |----watches
+|                 |----authors
 |                           |----add
-|                                   |----admin.watches.add.ctrl.js
-|                                   |----admin.watches.add.mdl.js
+|                                   |----admin.authors.add.ctrl.js
+|                                   |----admin.authors.add.mdl.js
 |                           |----edit
-|                                   |----admin.watches.edit.ctrl.js
-|                                   |----admin.watches.edit.mdl.js
-|                           |----admin.watches.mdl.js
+|                                   |----admin.authors.edit.ctrl.js
+|                                   |----admin.authors.edit.mdl.js
+|                           |----admin.authors.ctrl.js
+|                           |----admin.authors.mdl.js
+|                           |----admin.authors.service.js
+|                 |----quotes
+|                           |----add
+|                                   |----admin.quotes.add.ctrl.js
+|                                   |----admin.quotes.add.mdl.js
+|                           |----edit
+|                                   |----admin.quotes.edit.ctrl.js
+|                                   |----admin.quotes.edit.mdl.js
+|                           |----admin.quotes.ctrl.js
+|                           |----admin.quotes.mdl.js
+|                           |----admin.quotes.service.js
 |                 |----admin.ctrl.js
 |                 |----admin.mdl.js
-|       |----cart
-|                 |----checkout
-|                           |----cart.checkout.mdl.js
-|                 |----cart.ctrl.js
-|                 |----cart.mdl.js
-|                 |----cart.service.js
+|       |----author
+|                 |----author.ctrl.js
+|                 |----author.mdl.js
+|       |----emoji
+|                 |----emoji.ctrl.js
+|                 |----emoji.mdl.js
+|                 |----emoji.service.js
 |       |----user
 |                 |----user.service.js
 |       |----main.mdl.js
@@ -195,6 +210,7 @@ ecommerce-app
 |       |----js
 |----css
 |----views
+|----resources
 |----gulpfile.js
 |----app-server.js
 |----bower.json
@@ -213,7 +229,7 @@ ecommerce-app
     &lt;meta name="description" content=""&gt;
     &lt;meta name="author" content=""&gt;
 
-    &lt;title&gt;Ecommerce App&lt;/title&gt;
+    &lt;title&gt;Emoji App&lt;/title&gt;
 
     &lt;!-- bower:css --&gt;
     &lt;!-- endbower --&gt;
@@ -252,7 +268,7 @@ ecommerce-app
                 Copy the following code into your gulpfile.js file:
             </p>
             <pre>
-//ecommerce-app/gulpfile.js
+//emoji-app/gulpfile.js
 'use strict';
 
 var gulp = require('gulp'),
@@ -287,7 +303,8 @@ gulp.task('config', function () {
         MEDIA_URL: 'https://api.cosmicjs.com/v1/' + process.env.COSMIC_BUCKET + '/media',
         URL: 'https://api.cosmicjs.com/v1/',
         READ_KEY: process.env.COSMIC_READ_KEY || '',
-        WRITE_KEY: process.env.COSMIC_WRITE_KEY || ''
+        WRITE_KEY: process.env.COSMIC_WRITE_KEY || '',
+        DEFAULT_IMAGE: process.env.DEFAULT_IMAGE || ''
     });
     return b2v.stream(new Buffer(json), 'config.js')
         .pipe(gulpNgConfig('config'))
@@ -307,9 +324,10 @@ gulp.task('bower', function () {
     }))
     .pipe(gulp.dest(''));
 });
+
             </pre>
             <p>
-                After that we can create main module. Copy and paste the following code into your index.html file:
+                After that we can create main module. Copy and paste the following code into your main.mdl.js file:
             </p>
             <pre>
 (function () {
@@ -326,14 +344,18 @@ gulp.task('bower', function () {
             'cr.acl',
             'ui-notification',
             'ngFlash',
+            'ngAnimate',
             'textAngular',
             'flow',
             'angular-loading-bar',
-            'hl.sticky',
+            'ngDragDrop',
+            'ngEmoticons',
+            'ngSanitize',
+            'ngTouch',
 
-            'watch',
-            'cart',
+            'emoji',
             'admin',
+            'author',
 
             'config'
         ])
@@ -362,9 +384,9 @@ gulp.task('bower', function () {
 
             switch (crAcl.getRole()) {
                 case 'ROLE_ADMIN':
-                    state = 'admin.watches';
+                    state = 'admin.authors';
                     break;
-                default : state = 'main.watch';
+                default : state = 'main.emoji';
             }
 
             if (state) $state.go(state);
@@ -376,7 +398,7 @@ gulp.task('bower', function () {
                 url: '/',
                 abstract: true,
                 templateUrl: '../views/main.html',
-                controller: 'CartCtrl as cart',
+                // controller: 'CartCtrl as cart',
                 data: {
                     is_granted: ['ROLE_GUEST']
                 }
@@ -411,7 +433,7 @@ gulp.task('bower', function () {
             });
 
         crAcl
-            .setRedirect('main.watch');
+            .setRedirect('main.emoji');
 
         if ($rootScope.globals.currentUser) {
             crAcl.setRole($rootScope.globals.currentUser.metadata.role);
@@ -422,7 +444,22 @@ gulp.task('bower', function () {
         }
 
     }
+    angular.module('main')
+        .directive('compile', ['$compile', function ($compile) {
+            return function (scope, element, attrs) {
+                scope.$watch(
+                    function (scope) {
+                        // watch the 'compile' expression for changes
+                        return scope.$eval(attrs.compile);
+                    },
+                    function (value) {
+                        element.html(value);
 
+                        $compile(element.contents())(scope);
+                    }
+                );
+            };
+        }]);
 })();
              </pre>
             <p>
@@ -441,8 +478,6 @@ gulp.task('bower', function () {
 
         vm.login = login;
 
-        vm.showRegisterForm = false;
-
         vm.loginForm = null;
 
         vm.credentials = {};
@@ -456,7 +491,7 @@ gulp.task('bower', function () {
 
                         crAcl.setRole(currentUser.metadata.role);
                         AuthService.setCredentials(currentUser);
-                        $state.go('admin.watches');
+                        $state.go('admin.authors');
                     }
                     else
                         Flash.create('danger', 'Incorrect username or password');
@@ -602,7 +637,7 @@ gulp.task('bower', function () {
 })();
             </pre>
             <p>
-                Create Watch Service for get, update, add delete Watches from Cosmic JS API, copy and paste the code below:
+                Create Emoji Service for get emoji from words, copy and paste the code below:
             </p>
             <pre>
 (function () {
@@ -610,199 +645,100 @@ gulp.task('bower', function () {
 
     angular
         .module('main')
-        .service('WatchService', function ($http,
-                                          $cookieStore,
-                                          $q,
-                                          $rootScope,
-                                          URL, BUCKET_SLUG, READ_KEY, WRITE_KEY, MEDIA_URL) {
+        .service('EmojiService', function ($http) {
 
-            $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+            var that = this;
 
-            this.watch = {
-                title: null,
-                type_slug: 'watches',
-                content: null,
-                metafields: [
-                    {
-                        key: "category",
-                        title: "Category",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "brand",
-                        title: "Brand",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "case_size",
-                        title: "Case Size",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "case_thickness",
-                        title: "Case Thickness",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "strap_width",
-                        title: "Strap Width",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "movement",
-                        title: "Movement",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "glass",
-                        title: "Glass",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "water_resistance",
-                        title: "Water Resistance",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "color",
-                        title: "Color",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "strap_material",
-                        title: "Strap Material",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "price",
-                        title: "Price",
-                        type: "text",
-                        value: null
-                    },
-                    {
-                        key: "images",
-                        title: "Images",
-                        type: "parent",
-                        value: "",
-                        children: [
-                            {
-                                key: "image_1",
-                                title: "Image_1",
-                                type: "file"
-                            },
-                            {
-                                key: "image_2",
-                                title: "Image_2",
-                                type: "file"
-                            },
-                            {
-                                key: "image_3",
-                                title: "Image_3",
-                                type: "file"
-                            }
-                        ]
-                    }
-                ]
+            that.Quote = function (text, author, slug) {
+                this.text = text;
+                this.author = author;
+                this.slug = slug;
             };
 
-            this.getWatches = function (params) {
-                if (!angular.equals({}, params))
-                    return $http.get(URL + BUCKET_SLUG + '/object-type/watches/search', {
-                        params: {
-                            metafield_key: params.key,
-                            metafield_value_has: params.value,
-                            limit: 100,
-                            read_key: READ_KEY
+            that.Emoji = function (code, position) {
+                this.code = code;
+                this.position = position;
+            };
+
+            that.Container = function (type, item) {
+                this.type = type;
+                this.item = item;
+            };
+
+            that.Random = {
+                randNumOld: 0,
+                getRandomInt: function (min, max) {
+                    var randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+                    if (randNum == this.randNumOld) return this.getRandomInt(min, max);
+                    this.randNumOld = randNum;
+
+                    return randNum;
+                }
+            };
+
+            this.getEmojisFromWords = function (quote) {
+                var words = [];
+                var word = '';
+
+                quote += " ";
+
+                for (var i = 0; i < quote.length; i++) {
+                    if (quote[i] !== ' ') word += quote[i];
+                    else {
+                        words.push(word);
+                        word = '';
+                    }
+                }
+
+                for (var j = 0; j < words.length; j++) {
+                    if (getMeAnEmoji(words[j]) !== "") words[j] = ":" + getMeAnEmoji(words[j]) + ":";
+                }
+
+                console.log(words);
+                return words;
+            };
+
+            this.getEmoji = function (quote, emojis, containers, checkAnswers) {
+                var i = 0;
+                var position = 0;
+                var result;
+                var word = '';
+                var isEmoji = new RegExp(":");
+                var _quote = quote;
+
+                while (i < quote.text.length) {
+                    if (isEmoji.test(quote.text[i])) {
+                        result = ( /\:(\w+)\:/.exec(quote.text) )[1];
+                        emojis.push(new that.Emoji(":" + result + ":", i));
+                        containers.push(new that.Container('emoji', []));
+                        checkAnswers.push(new that.Emoji(":" + result + ":", position));
+
+                        quote.text[i] = quote.text[i].replace(':' + result + ':', '_emoji_');
+
+                        position++;
+                    }
+                    else {
+                        containers.push(new that.Container('word', quote.text[i]));
+                    }
+                    word = '';
+                    i++;
+                }
+
+                $http.get('/resources/emojis.json')
+                    .success(function (data) {
+                        for (var j = 0; j < 3; j++) {
+                            emojis.push(new that.Emoji(":" + data[parseInt(Math.random() * data.length)] + ":"));
                         }
                     });
-                else
-                    return $http.get(URL + BUCKET_SLUG + '/object-type/watches', {
-                        params: {
-                            limit: 100,
-                            read_key: READ_KEY
-                        }
-                    });
+
+                return _quote;
             };
-            this.getWatchesParams = function () {
-                return $http.get(URL + BUCKET_SLUG + '/object-type/watches', {
-                    params: {
-                        limit: 100,
-                        read_key: READ_KEY
-                    }
-                });
-            };
-            this.getWatchBySlug = function (slug) {
-                return $http.get(URL + BUCKET_SLUG + '/object/' + slug, {
-                    params: {
-                        read_key: READ_KEY
-                    }
-                });
-            };
-            this.updateWatch = function (event) {
-                event.write_key = WRITE_KEY;
 
-                return $http.put(URL + BUCKET_SLUG + '/edit-object', event);
-            };
-            this.removeWatch = function (slug) {
-                return $http.delete(URL + BUCKET_SLUG + '/' + slug, {
-                    ignoreLoadingBar: true,
-                    headers:{
-                        'Content-Type': 'application/json'
-                    },
-                    data: {
-                        write_key: WRITE_KEY
-                    }
-                });
-            };
-            this.createWatch = function (watch) {
-                watch.write_key = WRITE_KEY;
-
-                return $http.post(URL + BUCKET_SLUG + '/add-object', watch);
-            };
-            this.upload = function (file) {
-                var fd = new FormData();
-
-                fd.append('media', file);
-                fd.append('write_key', WRITE_KEY);
-
-                var defer = $q.defer();
-
-                var xhttp = new XMLHttpRequest();
-
-                xhttp.upload.addEventListener("progress",function (e) {
-                    defer.notify(parseInt(e.loaded * 100 / e.total));
-                });
-                xhttp.upload.addEventListener("error",function (e) {
-                    defer.reject(e);
-                });
-
-                xhttp.onreadystatechange = function() {
-                    if (xhttp.readyState === 4) {
-                        defer.resolve(JSON.parse(xhttp.response)); //Outputs a DOMString by default
-                    }
-                };
-
-                xhttp.open("post", MEDIA_URL, true);
-
-                xhttp.send(fd);
-
-                return defer.promise;
-            }
         });
 })();
             </pre>
             <p>
-                Create Watch Controller for get all events and remove, copy and paste the code below:
+                Create Emoji Controller for get quotes and checking results, copy and paste the code below:
             </p>
             <pre>
 (function () {
@@ -810,98 +746,206 @@ gulp.task('bower', function () {
 
     angular
         .module('main')
-        .controller('WatchCtrl', WatchCtrl);
+        .controller('EmojiCtrl', EmojiCtrl);
 
-    function WatchCtrl($stateParams, WatchService, Notification, $log, MEDIA_URL, $state) {
+    function EmojiCtrl($scope, DEFAULT_IMAGE, EmojiService, AdminQuotesService, $log) {
         var vm = this;
 
-        vm.getWatches = getWatches;
-        vm.removeWatch = removeWatch;
+        vm.checkAnswers = [];
+        vm.quote = {};
+        vm.quotes = [];
+        vm.emojis = [];
+        vm.containers = [];
+        vm.win = false;
 
-        vm.params = $stateParams;
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
-        vm.categories = [];
-        vm.brands = [];
-        vm.case_sizes = [];
-        vm.colors = [];
+        var random = EmojiService.Random;
+        var getEmojisFromWords = EmojiService.getEmojisFromWords;
+        var getEmoji = EmojiService.getEmoji;
+        var Quote = EmojiService.Quote;
+        var Emoji = EmojiService.Emoji;
 
-        vm.watches = [];
+        var getRandomQuote = _getRandomQuote;
+        var getUserAnswers = _getUserAnswers;
 
-        function getWatches() {
+        vm.getUserAnswerLength = getUserAnswerLength;
+        vm.nextQuote = nextQuote;
+        vm.checkAnswer = checkAnswer;
+        vm.getUserAnswerLength = getUserAnswerLength;
+
+        $scope.getOptionsContainer = getOptionsContainer;
+
+        function _getRandomQuote(quotes) {
+            var _random = random.getRandomInt(0, quotes.length - 1);
+            console.log(quotes[_random]);
+            return quotes[_random].slug;
+        }
+
+        function _getUserAnswers(containers) {
+            var userAnswers = [];
+            var position = 0;
+
+            for (var i = 0; i < containers.length; i++) {
+
+                if (!Array.isArray(containers[i].item)) continue;
+                userAnswers.push(new Emoji(containers[i].item[0].code, position));
+                position++;
+
+            }
+
+            return userAnswers;
+        }
+
+        function getUserAnswerLength() {
+            var userAnswersLength = 0;
+
+            for (var k = 0; k < vm.containers.length; k++) {
+                if (!Array.isArray(vm.containers[k].item)) continue;
+                if (vm.containers[k].item.length !== 0) userAnswersLength += 1;
+            }
+            return userAnswersLength;
+        }
+
+        function nextQuote() {
+            getQuote(getRandomQuote(vm.quotes));
+        }
+
+        function checkAnswer() {
+            var result = [];
+            var position = 0;
+
+            function in_array(value, array) {
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i] == value) return true;
+                }
+                return false;
+            }
+
+            if (vm.getUserAnswerLength() === vm.checkAnswers.length) {
+                var userAnswers = getUserAnswers(vm.containers);
+                for (var j = 0; j < userAnswers.length; j++) {
+                    vm.checkAnswers[j].code === userAnswers[j].code ? result.push(true) : result.push(false);
+                }
+
+                console.log(result);
+
+                for (var i = 0; i < vm.containers.length; i++) {
+
+                    if (!Array.isArray(vm.containers[i].item)) continue;
+                    if (!result[position]) {
+                        vm.emojis[vm.containers[i].item[0].jqyoui_pos] = new Emoji(vm.containers[i].item[0].code, i);
+                        vm.containers[i].item.splice(0, 1);
+                    }
+                    position++;
+
+                }
+
+                console.log(vm.emojis);
+                !in_array(false, result) ? vm.win = true : vm.win = false;
+            }
+        }
+
+        function getOptionsContainer(container) {
+            return {
+                accept: function (dragEl) {
+                    if (container.length >= 1) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        function getQuotes() {
             function success(response) {
-                $log.info(response);
-
-                vm.watches = response.data.objects;
-
-            }
-
-            function failed(response) {
-                $log.error(response);
-            }
-
-            function params(response) {
-                response.data.objects.forEach(function (item) {
-                    if (vm.categories.indexOf(item.metadata.category) === -1)
-                        vm.categories.push(item.metadata.category);
-                    if (vm.brands.indexOf(item.metadata.brand) === -1)
-                        vm.brands.push(item.metadata.brand);
-                    if (vm.case_sizes.indexOf(item.metadata.case_size) === -1)
-                        vm.case_sizes.push(item.metadata.case_size);
-                    if (vm.colors.indexOf(item.metadata.color) === -1)
-                        vm.colors.push(item.metadata.color)
+                response.data.objects.forEach(function (quote) {
+                    vm.quotes.push(
+                        new Quote(
+                            getEmojisFromWords(quote.metadata.text),
+                            quote.metadata.author,
+                            quote.slug
+                        )
+                    );
                 });
-            }
+                $log.info(vm.quotes);
 
-            WatchService
-                .getWatches($stateParams)
-                .then(success, failed);
+                getQuote(getRandomQuote(vm.quotes));
 
-            WatchService
-                .getWatchesParams()
-                .then(params);
-        }
-
-        function removeWatch(slug) {
-            function success(response) {
-                $log.info(response);
-                getWatches();
-                Notification.success('Removed!');
             }
 
             function failed(response) {
                 $log.error(response);
             }
 
-            WatchService
-                .removeWatch(slug)
+            AdminQuotesService
+                .getQuotes(true)
                 .then(success, failed);
-
         }
 
+        function getQuote(slug) {
+            function success(response) {
+                vm.quote = new Quote(
+                    getEmojisFromWords(response.data.object.metadata.text),
+                    response.data.object.metadata.author,
+                    response.data.object.slug
+                );
+
+                vm.emojis = [];
+                vm.containers = [];
+                vm.checkAnswers = [];
+                vm.win = false;
+
+                getEmoji(
+                    vm.quote,
+                    vm.emojis,
+                    vm.containers,
+                    vm.checkAnswers
+                );
+
+                vm.emojis.sort(function (a, b) {
+                    return a.code.charCodeAt(1) - b.code.charCodeAt(2)
+                });
+
+                vm.emojis.reverse();
+                console.log('emojis', vm.emojis);
+            }
+
+            function failed(response) {
+                $log.error(response);
+            }
+
+            AdminQuotesService
+                .getQuoteBySlug(slug)
+                .then(success, failed);
+        }
+
+        getQuotes();
+
+        $('.emoji').draggable(); // FOR TouchScreen
     }
 })();
             </pre>
             <p>
-                Create Watch Module, copy and paste the code below:
+                Create Emoji Module, copy and paste the code below:
             </p>
             <pre>
 (function () {
     'use strict';
 
     angular
-        .module('watch', [
-            'watch.profile'
-        ])
+        .module('emoji', [])
         .config(config);
 
     config.$inject = ['$stateProvider', '$urlRouterProvider'];
     function config($stateProvider, $urlRouterProvider) {
 
         $stateProvider
-            .state('main.watch', {
-                url: '?key&value',
-                templateUrl: '../views/watch/watch.list.html',
-                controller: 'WatchCtrl as vm'
+            .state('main.emoji', {
+                url: '',
+                templateUrl: '../views/emoji/emoji.html',
+                controller: 'EmojiCtrl as emojiCtrl'
             });
     }
 })();
@@ -910,12 +954,12 @@ gulp.task('bower', function () {
                 What's going on here:
             </h2>
             <ol>
-                <li>We created Watch Service for our asynchronous calls to our Cosmic JS API. We can create, update, remove and getting Watches.</li>
-                <li>We created Watch Controller for getting all watches and remove.</li>
-                <li>We created Watch Module.</li>
+                <li>We created Emoji Service for get emoji from words.</li>
+                <li>We created Emoji Controller for drag and drop emoji, get quotes and checking results.</li>
+                <li>We created Emoji Module.</li>
             </ol>
             <p>
-                Create Watch Profile Controller for getting watch information, copy and paste the code below:
+                Create Author Controller for getting information of author, copy and paste the code below:
             </p>
             <pre>
 (function () {
@@ -923,348 +967,57 @@ gulp.task('bower', function () {
 
     angular
         .module('main')
-        .controller('WatchProfileCtrl', WatchProfileCtrl);
+        .controller('AuthorCtrl', AuthorCtrl);
 
-    function WatchProfileCtrl(UserService, $stateParams, WatchService, Notification, $log, MEDIA_URL, $state) {
+    function AuthorCtrl($stateParams, $scope, DEFAULT_IMAGE, AdminAuthorsService, Flash, $log) {
         var vm = this;
 
-        vm.getWatch = getWatch;
+        vm.author = {};
 
-        function getWatch() {
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
+
+        getAuthor($stateParams.slug);
+
+        function getAuthor(slug) {
             function success(response) {
-                $log.info(response);
-                vm.watch = response.data.object;
+                response.data.object.metadata.born = new Date(response.data.object.metafields[2].value);
+                response.data.object.metadata.died = new Date(response.data.object.metafields[3].value);
+                vm.author = response.data.object;
             }
 
             function failed(response) {
                 $log.error(response);
             }
 
-            WatchService
-                .getWatchBySlug($stateParams.slug)
+            AdminAuthorsService
+                .getAuthorBySlug(slug)
                 .then(success, failed);
         }
-
     }
 })();
-
-            </pre>
+</pre>
             <p>
-                Create Watch Profile Module, copy and paste the code below:
+                Create Author Module, copy and paste the code below:
             </p>
             <pre>
 (function () {
     'use strict';
 
     angular
-        .module('watch.profile', [])
+        .module('author', [])
         .config(config);
 
     config.$inject = ['$stateProvider', '$urlRouterProvider'];
     function config($stateProvider, $urlRouterProvider) {
 
         $stateProvider
-            .state('main.watch.profile', {
-                url: 'watches/:slug',
-                views: {
-                    '@main': {
-                        templateUrl: '../views/watch/watch.profile.html',
-                        controller: 'WatchProfileCtrl as vm'
-                    }
+            .state('main.author', {
+                url: 'author/:slug',
+                templateUrl: '../views/author/author.html',
+                controller: 'AuthorCtrl as vm',
+                data: {
+                    is_granted: ['ROLE_GUEST']
                 }
-            });
-    }
-
-})();
-</pre>
-<p>
-    Create Cart Controller, copy and paste the code below:
-</p>
-<pre>
-    (function () {
-    'use strict';
-
-    angular
-        .module('main')
-        .controller('CartCtrl', CartCtrl);
-
-    function CartCtrl(CartService, WatchService, Notification, $log, MEDIA_URL, $state) {
-        var vm = this;
-
-        vm.addToCart = addToCart;
-        vm.getCart = getCart;
-        vm.hasInCart = hasInCart;
-        vm.removeFromCart = removeFromCart;
-        vm.completeOrder = completeOrder;
-
-        vm.cart = {};
-        vm.cart.order = {};
-        vm.watches = [];
-        vm.totalPrice = 0;
-        vm.orderForm = null;
-
-        function addToCart(item) {
-            function success(response) {
-                Notification.success(response);
-                getCart();
-
-            }
-
-            function failed(response) {
-                Notification.error(response);
-            }
-
-            CartService
-                .addToCart(item)
-                .then(success, failed);
-
-        }
-
-        function completeOrder(order) {
-            order.watches = vm.watches;
-
-            function success(response) {
-                Notification.success('Success');
-
-            }
-
-            function failed(response) {
-                Notification.error(response.data.message);
-            }
-
-            if (vm.orderForm)
-                CartService
-                    .completeOrder(order)
-                    .then(success, failed);
-        }
-
-        function removeFromCart(_id) {
-            function success(response) {
-                Notification.success(response);
-                getCart();
-            }
-
-            function failed(response) {
-                Notification.error(response);
-            }
-
-            CartService
-                .removeFromCart(_id)
-                .then(success, failed);
-
-        }
-
-        function hasInCart(_id) {
-            return CartService.hasInCart(_id);
-        }
-
-        function getCart() {
-            function success(response) {
-                vm.cart = response;
-                getWatches();
-
-                $log.info(response);
-            }
-
-            function failed(response) {
-                $log.error(response);
-            }
-
-            CartService
-                .getCart()
-                .then(success, failed);
-
-        }
-
-        function getWatches() {
-            function success(response) {
-                $log.info(response);
-
-                vm.watches = [];
-                vm.totalPrice = 0;
-
-                for (var _id in vm.cart)
-                    response.data.objects.forEach(function (item) {
-                        if (item._id === _id) {
-                            vm.watches.push(item);
-                            vm.totalPrice += item.metadata.price;
-                        }
-                    });
-
-            }
-
-            function failed(response) {
-                $log.error(response);
-            }
-
-            WatchService
-                .getWatches({})
-                .then(success, failed);
-
-        }
-    }
-})();
-</pre>
-            <p>
-                Create Cart Service, copy and paste the code below:
-            </p>
-<pre>
-    (function () {
-    'use strict';
-
-    angular
-        .module('main')
-        .service('CartService', function ($http,
-                                          $cookieStore,
-                                          $q,
-                                          $rootScope,
-                                          URL, BUCKET_SLUG, READ_KEY, WRITE_KEY) {
-            var that = this;
-            $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-            that.addToCart = function (item) {
-                var deferred = $q.defer();
-
-                var cart = $cookieStore.get('cart');
-                cart = cart ? cart : {};
-
-                if (!(item._id in cart)) {
-                    cart[item._id] = item._id;
-
-                    $cookieStore.put('cart', cart);
-
-                    deferred.resolve('Added to cart');
-                } else {
-                    deferred.reject('Error: Can\'t added to cart');
-                }
-
-                return deferred.promise;
-            };
-
-            that.getCart = function () {
-                var deferred = $q.defer();
-                var cart = $cookieStore.get('cart');
-
-                if (cart) {
-                    deferred.resolve(cart);
-                } else {
-                    deferred.reject('Error: Can\'t get cart');
-                }
-
-                return deferred.promise;
-            };
-
-            that.removeFromCart = function (_id) {
-                var deferred = $q.defer();
-
-                var cart = $cookieStore.get('cart');
-                cart = cart ? cart : {};
-
-                if (_id in cart) {
-                    delete cart[_id];
-
-                    $cookieStore.put('cart', cart);
-
-                    deferred.resolve('Removed from cart');
-                } else {
-                    deferred.reject('Error: Can\'t remove from cart');
-                }
-
-                return deferred.promise;
-            };
-
-            that.hasInCart = function (_id) {
-                var cart = $cookieStore.get('cart');
-                cart = cart ? cart : {};
-
-                return _id in cart;
-            };
-
-            that.completeOrder = function (order) {
-                var watches = [];
-
-                order.watches.forEach(function (item) {
-                    watches.push(item._id);
-                });
-
-                return $http.post(URL + BUCKET_SLUG + '/add-object/', {
-                    write_key: WRITE_KEY,
-                    title: order.firstName + ' ' + order.lastName,
-                    type_slug: "orders",
-                    metafields: [
-                        {
-                            key: "first_name",
-                            type: "text",
-                            value: order.firstName
-
-                        },
-                        {
-                            key: "last_name",
-                            type: "text",
-                            value: order.lastName
-
-                        },
-                        {
-                            key: "address",
-                            type: "text",
-                            value: order.address
-
-                        },
-                        {
-                            key: "city",
-                            type: "text",
-                            value: order.city
-
-                        },
-                        {
-                            key: "phone",
-                            type: "text",
-                            value: order.phone
-
-                        },
-                        {
-                            key: "postal_code",
-                            type: "text",
-                            value: order.postalCode
-
-                        },
-                        {
-                            key: "email",
-                            type: "text",
-                            value: order.email
-                        },
-                        {
-                            key: "watches",
-                            type: "objects",
-                            object_type: "watches",
-                            value: watches.join()
-                        }
-                    ]
-                });
-            };
-        });
-})();
-</pre>
-            <p>
-                Create Cart Module, copy and paste the code below:
-            </p>
-<pre>
-    (function () {
-    'use strict';
-
-    angular
-        .module('cart', [
-            'cart.checkout'
-        ])
-        .config(config);
-
-    config.$inject = ['$stateProvider', '$urlRouterProvider'];
-    function config($stateProvider, $urlRouterProvider) {
-
-        $stateProvider
-            .state('main.cart', {
-                url: 'cart',
-                templateUrl: '../views/cart/cart.html'
             });
     }
 })();
@@ -1273,8 +1026,7 @@ gulp.task('bower', function () {
                 What's going on here:
             </h2>
             <ol>
-                <li>We can see information about watches.</li>
-                <li>We can adding watches to cart.</li>
+                <li>We can see information about authors.</li>
             </ol>
             <h2>Conclusion:</h2>
             <p>

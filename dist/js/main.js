@@ -16,8 +16,6 @@
             'textAngular',
             'flow',
             'angular-loading-bar',
-            // 'hl.sticky',
-            // 'stripe.checkout',
             'ngDragDrop',
             'ngEmoticons',
             'ngSanitize',
@@ -123,14 +121,8 @@
                         return scope.$eval(attrs.compile);
                     },
                     function (value) {
-                        // when the 'compile' expression changes
-                        // assign it into the current DOM
                         element.html(value);
 
-                        // compile the new DOM and link it to the current
-                        // scope.
-                        // NOTE: we only compile .childNodes so that
-                        // we don't get into infinite loop compiling ourselves
                         $compile(element.contents())(scope);
                     }
                 );
@@ -138,122 +130,6 @@
         }]);
 })();
  
-(function () {
-    'use strict'; 
-
-    angular
-        .module('main')
-        .controller('AuthCtrl', AuthCtrl);
-
-    function AuthCtrl(crAcl, $state, AuthService, Flash, $log) {
-        var vm = this;              
-
-        vm.login = login;
-        
-        vm.showRegisterForm = false;
-        
-        vm.loginForm = null;
-        
-        vm.credentials = {};
-        vm.user = {};
-
-        function login(credentials) {
-            function success(response) {
-                function success(response) {
-                    if (response.data.status !== 'empty') {
-                        var currentUser = response.data.objects[0];
-
-                        crAcl.setRole(currentUser.metadata.role);
-                        AuthService.setCredentials(currentUser);
-                        $state.go('admin.authors');
-                    }
-                    else
-                        Flash.create('danger', 'Incorrect username or password');
-                }
-
-                function failed(response) {
-                    $log.error(response);
-                }
-
-                if (response.data.status !== 'empty')
-                    AuthService
-                        .checkPassword(credentials)
-                        .then(success, failed);
-                else
-                    Flash.create('danger', 'Incorrect username or password');
-
-                $log.info(response);
-            }
-
-            function failed(response) {
-                $log.error(response);
-            }
-
-            if (vm.loginForm.$valid)
-                AuthService
-                    .checkUsername(credentials)
-                    .then(success, failed);
-        }
-
-    }
-})();
-
-(function () {
-    'use strict';
-
-    angular
-        .module('main')
-        .service('AuthService', function ($http, 
-                                          $cookieStore, 
-                                          $q, 
-                                          $rootScope, 
-                                          URL, BUCKET_SLUG, READ_KEY, WRITE_KEY) {
-            var authService = this;
-            $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-            authService.checkUsername = function (credentials) {
-                return $http.get(URL + BUCKET_SLUG + '/object-type/users/search', {
-                    params: {
-                        metafield_key: 'email',
-                        metafield_value_has: credentials.email,
-                        limit: 1,
-                        read_key: READ_KEY
-                    }
-                });
-            };
-            authService.checkPassword = function (credentials) {
-                return $http.get(URL + BUCKET_SLUG + '/object-type/users/search', {
-                    ignoreLoadingBar: true,
-                    params: {
-                        metafield_key: 'password',
-                        metafield_value: credentials.password,
-                        limit: 1,
-                        read_key: READ_KEY
-                    }
-                });
-            };
-            authService.setCredentials = function (user) { 
-                $rootScope.globals = {
-                    currentUser: user
-                };
-                
-                $cookieStore.put('globals', $rootScope.globals);
-            };
-            authService.clearCredentials = function () {
-                var deferred = $q.defer();
-                $cookieStore.remove('globals');
-
-                if (!$cookieStore.get('globals')) {
-                    $rootScope.globals = {};
-                    deferred.resolve('Credentials clear success');
-                } else {
-                    deferred.reject('Can\'t clear credentials');
-                }
-
-                return deferred.promise;
-            };
-        });  
-})();  
 (function () {
     'use strict'; 
 
@@ -372,6 +248,120 @@
     }
 })();
  
+(function () {
+    'use strict'; 
+
+    angular
+        .module('main')
+        .controller('AuthCtrl', AuthCtrl);
+
+    function AuthCtrl(crAcl, $state, AuthService, Flash, $log) {
+        var vm = this;              
+
+        vm.login = login;
+        
+        vm.loginForm = null;
+        
+        vm.credentials = {};
+        vm.user = {};
+
+        function login(credentials) {
+            function success(response) {
+                function success(response) {
+                    if (response.data.status !== 'empty') {
+                        var currentUser = response.data.objects[0];
+
+                        crAcl.setRole(currentUser.metadata.role);
+                        AuthService.setCredentials(currentUser);
+                        $state.go('admin.authors');
+                    }
+                    else
+                        Flash.create('danger', 'Incorrect username or password');
+                }
+
+                function failed(response) {
+                    $log.error(response);
+                }
+
+                if (response.data.status !== 'empty')
+                    AuthService
+                        .checkPassword(credentials)
+                        .then(success, failed);
+                else
+                    Flash.create('danger', 'Incorrect username or password');
+
+                $log.info(response);
+            }
+
+            function failed(response) {
+                $log.error(response);
+            }
+
+            if (vm.loginForm.$valid)
+                AuthService
+                    .checkUsername(credentials)
+                    .then(success, failed);
+        }
+
+    }
+})();
+
+(function () {
+    'use strict';
+
+    angular
+        .module('main')
+        .service('AuthService', function ($http, 
+                                          $cookieStore, 
+                                          $q, 
+                                          $rootScope, 
+                                          URL, BUCKET_SLUG, READ_KEY, WRITE_KEY) {
+            var authService = this;
+            $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+            authService.checkUsername = function (credentials) {
+                return $http.get(URL + BUCKET_SLUG + '/object-type/users/search', {
+                    params: {
+                        metafield_key: 'email',
+                        metafield_value_has: credentials.email,
+                        limit: 1,
+                        read_key: READ_KEY
+                    }
+                });
+            };
+            authService.checkPassword = function (credentials) {
+                return $http.get(URL + BUCKET_SLUG + '/object-type/users/search', {
+                    ignoreLoadingBar: true,
+                    params: {
+                        metafield_key: 'password',
+                        metafield_value: credentials.password,
+                        limit: 1,
+                        read_key: READ_KEY
+                    }
+                });
+            };
+            authService.setCredentials = function (user) { 
+                $rootScope.globals = {
+                    currentUser: user
+                };
+                
+                $cookieStore.put('globals', $rootScope.globals);
+            };
+            authService.clearCredentials = function () {
+                var deferred = $q.defer();
+                $cookieStore.remove('globals');
+
+                if (!$cookieStore.get('globals')) {
+                    $rootScope.globals = {};
+                    deferred.resolve('Credentials clear success');
+                } else {
+                    deferred.reject('Can\'t clear credentials');
+                }
+
+                return deferred.promise;
+            };
+        });  
+})();  
 angular.module("config", [])
 .constant("BUCKET_SLUG", "emoji")
 .constant("URL", "https://api.cosmicjs.com/v1/")
@@ -392,7 +382,7 @@ angular.module("config", [])
         var vm = this;
 
         vm.checkAnswers = [];
-        vm.quote = {}; 
+        vm.quote = {};
         vm.quotes = [];
         vm.emojis = [];
         vm.containers = [];
@@ -421,6 +411,7 @@ angular.module("config", [])
             console.log(quotes[_random]);
             return quotes[_random].slug;
         }
+
         function _getUserAnswers(containers) {
             var userAnswers = [];
             var position = 0;
@@ -445,9 +436,11 @@ angular.module("config", [])
             }
             return userAnswersLength;
         }
+
         function nextQuote() {
             getQuote(getRandomQuote(vm.quotes));
         }
+
         function checkAnswer() {
             var result = [];
             var position = 0;
@@ -541,9 +534,9 @@ angular.module("config", [])
                     vm.checkAnswers
                 );
 
-                vm.emojis.sort(function(a, b) {
-                        return a.code.charCodeAt(1) - b.code.charCodeAt(2)
-                    });
+                vm.emojis.sort(function (a, b) {
+                    return a.code.charCodeAt(1) - b.code.charCodeAt(2)
+                });
 
                 vm.emojis.reverse();
                 console.log('emojis', vm.emojis);
@@ -559,11 +552,8 @@ angular.module("config", [])
         }
 
         getQuotes();
-
-
+        
         $('.emoji').draggable(); // FOR TouchScreen
-
-
     }
 })();
 
@@ -591,17 +581,11 @@ angular.module("config", [])
 
     angular
         .module('main')
-        .service('EmojiService', function ($http,
-                                          $cookieStore, 
-                                          $q, 
-                                          $rootScope,
-                                          URL, BUCKET_SLUG, READ_KEY, WRITE_KEY, MEDIA_URL) {
-            
-            $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+        .service('EmojiService', function ($http) {
             
             var that = this;
 
-            that.Quote = function (text, author, slug) {
+            that.Quote = function (text, author, slug) { 
                 this.text = text;
                 this.author = author;
                 this.slug = slug;
@@ -610,10 +594,6 @@ angular.module("config", [])
             that.Emoji = function (code, position) {
                 this.code = code;
                 this.position = position;
-
-                this.getEmoji = function () {
-                    console.log('asc');
-                }
             };
 
             that.Container = function (type, item) {
@@ -686,14 +666,6 @@ angular.module("config", [])
                             emojis.push(new that.Emoji(":" + data[parseInt(Math.random() * data.length)] + ":"));
                         }
                     });
-
-                // emojis.sort(function(a, b) {
-                //     return a.code.charCodeAt(1) + b.code.charCodeAt(2)
-                // });
-                //
-                // emojis.reverse();
-
-                console.log(containers);
 
                 return _quote;
             };

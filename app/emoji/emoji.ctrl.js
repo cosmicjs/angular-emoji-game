@@ -9,7 +9,7 @@
         var vm = this;
 
         vm.checkAnswers = [];
-        vm.quote = {}; 
+        vm.quote = {};
         vm.quotes = [];
         vm.emojis = [];
         vm.containers = [];
@@ -38,6 +38,7 @@
             console.log(quotes[_random]);
             return quotes[_random].slug;
         }
+
         function _getUserAnswers(containers) {
             var userAnswers = [];
             var position = 0;
@@ -62,9 +63,11 @@
             }
             return userAnswersLength;
         }
+
         function nextQuote() {
             getQuote(getRandomQuote(vm.quotes));
         }
+
         function checkAnswer() {
             var result = [];
             var position = 0;
@@ -158,9 +161,9 @@
                     vm.checkAnswers
                 );
 
-                vm.emojis.sort(function(a, b) {
-                        return a.code.charCodeAt(1) - b.code.charCodeAt(2)
-                    });
+                vm.emojis.sort(function (a, b) {
+                    return a.code.charCodeAt(1) - b.code.charCodeAt(2)
+                });
 
                 vm.emojis.reverse();
                 console.log('emojis', vm.emojis);
@@ -176,10 +179,7 @@
         }
 
         getQuotes();
-
-
+        
         $('.emoji').draggable(); // FOR TouchScreen
-
-
     }
 })();
