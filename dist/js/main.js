@@ -197,62 +197,6 @@
 
     angular
         .module('main')
-        .controller('AuthorCtrl', AuthorCtrl);
-
-    function AuthorCtrl($stateParams, $scope, DEFAULT_IMAGE, AdminAuthorsService, Flash, $log) {
-        var vm = this;
-
-        vm.author = {};
-        
-        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
-
-        getAuthor($stateParams.slug);
-
-        function getAuthor(slug) {
-            function success(response) {
-                response.data.object.metadata.born = new Date(response.data.object.metafields[2].value);
-                response.data.object.metadata.died = new Date(response.data.object.metafields[3].value);
-                vm.author = response.data.object;  
-            }
-
-            function failed(response) {
-                $log.error(response);
-            }
-
-            AdminAuthorsService
-                .getAuthorBySlug(slug)
-                .then(success, failed);
-        }
-    }
-})();
-
-(function () {
-    'use strict';
-
-    angular
-        .module('author', [])
-        .config(config);
-
-    config.$inject = ['$stateProvider', '$urlRouterProvider'];
-    function config($stateProvider, $urlRouterProvider) {
-
-        $stateProvider
-            .state('main.author', {
-                url: 'author/:slug',
-                templateUrl: '../views/author/author.html',
-                controller: 'AuthorCtrl as vm',
-                data: {
-                    is_granted: ['ROLE_GUEST']
-                }
-            });
-    }
-})();
- 
-(function () {
-    'use strict'; 
-
-    angular
-        .module('main')
         .controller('AuthCtrl', AuthCtrl);
 
     function AuthCtrl(crAcl, $state, AuthService, Flash, $log) {
@@ -362,6 +306,62 @@
             };
         });  
 })();  
+(function () {
+    'use strict'; 
+
+    angular
+        .module('main')
+        .controller('AuthorCtrl', AuthorCtrl);
+
+    function AuthorCtrl($stateParams, $scope, DEFAULT_IMAGE, AdminAuthorsService, Flash, $log) {
+        var vm = this;
+
+        vm.author = {};
+        
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
+
+        getAuthor($stateParams.slug);
+
+        function getAuthor(slug) {
+            function success(response) {
+                response.data.object.metadata.born = new Date(response.data.object.metafields[2].value);
+                response.data.object.metadata.died = new Date(response.data.object.metafields[3].value);
+                vm.author = response.data.object;  
+            }
+
+            function failed(response) {
+                $log.error(response);
+            }
+
+            AdminAuthorsService
+                .getAuthorBySlug(slug)
+                .then(success, failed);
+        }
+    }
+})();
+
+(function () {
+    'use strict';
+
+    angular
+        .module('author', [])
+        .config(config);
+
+    config.$inject = ['$stateProvider', '$urlRouterProvider'];
+    function config($stateProvider, $urlRouterProvider) {
+
+        $stateProvider
+            .state('main.author', {
+                url: 'author/:slug',
+                templateUrl: '../views/author/author.html',
+                controller: 'AuthorCtrl as vm',
+                data: {
+                    is_granted: ['ROLE_GUEST']
+                }
+            });
+    }
+})();
+ 
 angular.module("config", [])
 .constant("BUCKET_SLUG", "emoji")
 .constant("URL", "https://api.cosmicjs.com/v1/")
@@ -378,7 +378,7 @@ angular.module("config", [])
         .module('main')
         .controller('EmojiCtrl', EmojiCtrl);
 
-    function EmojiCtrl($scope, DEFAULT_IMAGE, EmojiService, AdminQuotesService, $log) {
+    function EmojiCtrl($scope, DEFAULT_IMAGE, $cookieStore, EmojiService, AdminQuotesService, $log) {
         var vm = this;
 
         vm.checkAnswers = [];
@@ -387,6 +387,7 @@ angular.module("config", [])
         vm.emojis = [];
         vm.containers = [];
         vm.win = false;
+        vm.toDo = !$cookieStore.get('todoHidden');
 
         vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
@@ -403,8 +404,14 @@ angular.module("config", [])
         vm.nextQuote = nextQuote;
         vm.checkAnswer = checkAnswer;
         vm.getUserAnswerLength = getUserAnswerLength;
+        vm.closeTodo = closeTodo;
 
         $scope.getOptionsContainer = getOptionsContainer;
+
+        function closeTodo() {
+            $cookieStore.put('todoHidden', true);
+            vm.toDo = !$cookieStore.get('todoHidden');
+        }
 
         function _getRandomQuote(quotes) {
             var _random = random.getRandomInt(0, quotes.length - 1);
@@ -1112,9 +1119,9 @@ angular.module("config", [])
             AdminAuthorsService
                 .upload(vm.flow.files[0].file)
                 .then(function(response){
-                    
+                     
                     $scope.ngDialogData.metafields[1].value = response.media.name;
-                    updateAuthor();
+                    addAuthor();
 
                 }, function(){
                     console.log('failed :(');
@@ -1165,152 +1172,6 @@ angular.module("config", [])
                                 data: data,
                                 showClose: true,
                                 controller: 'AdminAuthorsAdd as vm'
-                            };
-
-                            ngDialog.open(options).closePromise.finally(function () {
-                                $state.go('admin.authors', {}, {reload: true});
-                            });
-                        }
-                    }]
-            });
-    }
-})();
- 
-(function () {
-    'use strict'; 
-
-    angular
-        .module('main')
-        .controller('AdminAuthorsEdit', AdminAuthorsEdit);
-
-    function AdminAuthorsEdit($state, AdminAuthorsService, Notification, $log, $scope, DEFAULT_IMAGE, MEDIA_URL, ngDialog) {
-        var vm = this;
-
-        vm.cancelUpload = cancelUpload;
-        vm.save = save;
-
-        vm.uploadProgress = 0;
-        vm.showContent = false;
-
-        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
-
-        vm.author = {};
-        vm.flow = {};
-        vm.authorEditForm = null;
-
-        vm.flowConfig = {
-            target: MEDIA_URL,
-            singleFile: true
-        };
-
-        function updateAuthor() {
-            function success(response) {
-                $log.info(response);
-
-                Notification.primary(
-                    {
-                        message: 'Saved',
-                        delay: 800,
-                        replaceMessage: true
-                    }
-                );
-
-                $state.go('admin.authors', null, {reload: true});
-                ngDialog.close();
-            }
-
-            function failed(response) {
-                $log.error(response);
-            }
-
-
-            if (vm.authorEditForm.$valid)
-                AdminAuthorsService
-                    .updateAuthor($scope.ngDialogData)
-                    .then(success, failed);
-        }
-
-        function cancelUpload() {
-            vm.flow.cancel();
-            vm.background = {
-                'background-image': 'url(' + (vm.event.metafields[0].value ? vm.event.metafields[0].url : DEFAULT_EVENT_IMAGE) + ')'
-            };
-        }
-
-        function upload() {
-            AdminAuthorsService
-                .upload(vm.flow.files[0].file)
-                .then(function(response){
-                    
-                    $scope.ngDialogData.metafields[1].value = response.media.name;
-                    updateAuthor();
-
-                }, function(){
-                    console.log('failed :(');
-                }, function(progress){
-                    vm.uploadProgress = progress;
-                });
-        }
-        
-        function save() {
-            if (vm.flow.files.length) 
-                upload();
-            else
-                updateAuthor();
-        }
-
-    }
-})();
-
-(function () {
-    'use strict';
-    
-    angular
-        .module('admin.authors.edit', [])
-        .config(config);
-
-    config.$inject = ['$stateProvider', '$urlRouterProvider'];
-    function config($stateProvider, $urlRouterProvider) {
-
-        $stateProvider
-            .state('admin.authors.edit', {
-                url: '/edit/:slug',
-                data: {
-                    is_granted: ['ROLE_ADMIN']
-                },
-                onEnter: [
-                    'ngDialog',
-                    'AdminAuthorsService',
-                    '$stateParams',
-                    '$state',
-                    '$log',
-                    function (ngDialog, AdminAuthorsService, $stateParams, $state, $log) {
-                        getAuthor($stateParams.slug);
-
-                        function getAuthor(slug) {
-                            function success(response) {
-                                response.data.object.metafields[2].value = new Date(response.data.object.metafields[2].value);
-                                response.data.object.metafields[3].value = new Date(response.data.object.metafields[3].value);
-
-                                openDialog(response.data.object);
-                            }
-
-                            function failed(response) {
-                                $log.error(response);
-                            }
-
-                            AdminAuthorsService
-                                .getAuthorBySlug(slug)
-                                .then(success, failed);
-                        }
-
-                        function openDialog(data) {
-
-                            var options = {
-                                templateUrl: '../views/admin/admin.authors.edit.html',
-                                data: data,
-                                showClose: true,
-                                controller: 'AdminAuthorsEdit as vm'
                             };
 
                             ngDialog.open(options).closePromise.finally(function () {
@@ -1545,6 +1406,152 @@ angular.module("config", [])
 
                             ngDialog.open(options).closePromise.finally(function () {
                                 $state.go('admin.quotes', {}, {reload: true});
+                            });
+                        }
+                    }]
+            });
+    }
+})();
+ 
+(function () {
+    'use strict'; 
+
+    angular
+        .module('main')
+        .controller('AdminAuthorsEdit', AdminAuthorsEdit);
+
+    function AdminAuthorsEdit($state, AdminAuthorsService, Notification, $log, $scope, DEFAULT_IMAGE, MEDIA_URL, ngDialog) {
+        var vm = this;
+
+        vm.cancelUpload = cancelUpload;
+        vm.save = save;
+
+        vm.uploadProgress = 0;
+        vm.showContent = false;
+
+        vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
+
+        vm.author = {};
+        vm.flow = {};
+        vm.authorEditForm = null;
+
+        vm.flowConfig = {
+            target: MEDIA_URL,
+            singleFile: true
+        };
+
+        function updateAuthor() {
+            function success(response) {
+                $log.info(response);
+
+                Notification.primary(
+                    {
+                        message: 'Saved',
+                        delay: 800,
+                        replaceMessage: true
+                    }
+                );
+
+                $state.go('admin.authors', null, {reload: true});
+                ngDialog.close();
+            }
+
+            function failed(response) {
+                $log.error(response);
+            }
+
+
+            if (vm.authorEditForm.$valid)
+                AdminAuthorsService
+                    .updateAuthor($scope.ngDialogData)
+                    .then(success, failed);
+        }
+
+        function cancelUpload() {
+            vm.flow.cancel();
+            vm.background = {
+                'background-image': 'url(' + (vm.event.metafields[0].value ? vm.event.metafields[0].url : DEFAULT_EVENT_IMAGE) + ')'
+            };
+        }
+
+        function upload() {
+            AdminAuthorsService
+                .upload(vm.flow.files[0].file)
+                .then(function(response){
+                    
+                    $scope.ngDialogData.metafields[1].value = response.media.name;
+                    updateAuthor();
+
+                }, function(){
+                    console.log('failed :(');
+                }, function(progress){
+                    vm.uploadProgress = progress;
+                });
+        }
+        
+        function save() {
+            if (vm.flow.files.length) 
+                upload();
+            else
+                updateAuthor();
+        }
+
+    }
+})();
+
+(function () {
+    'use strict';
+    
+    angular
+        .module('admin.authors.edit', [])
+        .config(config);
+
+    config.$inject = ['$stateProvider', '$urlRouterProvider'];
+    function config($stateProvider, $urlRouterProvider) {
+
+        $stateProvider
+            .state('admin.authors.edit', {
+                url: '/edit/:slug',
+                data: {
+                    is_granted: ['ROLE_ADMIN']
+                },
+                onEnter: [
+                    'ngDialog',
+                    'AdminAuthorsService',
+                    '$stateParams',
+                    '$state',
+                    '$log',
+                    function (ngDialog, AdminAuthorsService, $stateParams, $state, $log) {
+                        getAuthor($stateParams.slug);
+
+                        function getAuthor(slug) {
+                            function success(response) {
+                                response.data.object.metafields[2].value = new Date(response.data.object.metafields[2].value);
+                                response.data.object.metafields[3].value = new Date(response.data.object.metafields[3].value);
+
+                                openDialog(response.data.object);
+                            }
+
+                            function failed(response) {
+                                $log.error(response);
+                            }
+
+                            AdminAuthorsService
+                                .getAuthorBySlug(slug)
+                                .then(success, failed);
+                        }
+
+                        function openDialog(data) {
+
+                            var options = {
+                                templateUrl: '../views/admin/admin.authors.edit.html',
+                                data: data,
+                                showClose: true,
+                                controller: 'AdminAuthorsEdit as vm'
+                            };
+
+                            ngDialog.open(options).closePromise.finally(function () {
+                                $state.go('admin.authors', {}, {reload: true});
                             });
                         }
                     }]

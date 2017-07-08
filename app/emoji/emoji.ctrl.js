@@ -5,7 +5,7 @@
         .module('main')
         .controller('EmojiCtrl', EmojiCtrl);
 
-    function EmojiCtrl($scope, DEFAULT_IMAGE, EmojiService, AdminQuotesService, $log) {
+    function EmojiCtrl($scope, DEFAULT_IMAGE, $cookieStore, EmojiService, AdminQuotesService, $log) {
         var vm = this;
 
         vm.checkAnswers = [];
@@ -14,6 +14,7 @@
         vm.emojis = [];
         vm.containers = [];
         vm.win = false;
+        vm.toDo = !$cookieStore.get('todoHidden');
 
         vm.DEFAULT_IMAGE = DEFAULT_IMAGE;
 
@@ -30,8 +31,14 @@
         vm.nextQuote = nextQuote;
         vm.checkAnswer = checkAnswer;
         vm.getUserAnswerLength = getUserAnswerLength;
+        vm.closeTodo = closeTodo;
 
         $scope.getOptionsContainer = getOptionsContainer;
+
+        function closeTodo() {
+            $cookieStore.put('todoHidden', true);
+            vm.toDo = !$cookieStore.get('todoHidden');
+        }
 
         function _getRandomQuote(quotes) {
             var _random = random.getRandomInt(0, quotes.length - 1);

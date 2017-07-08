@@ -63,9 +63,9 @@
             AdminAuthorsService
                 .upload(vm.flow.files[0].file)
                 .then(function(response){
-                    
+                     
                     $scope.ngDialogData.metafields[1].value = response.media.name;
-                    updateAuthor();
+                    addAuthor();
 
                 }, function(){
                     console.log('failed :(');
