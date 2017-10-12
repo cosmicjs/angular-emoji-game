@@ -22,4 +22,4 @@ gulp
 ```
 Then go to [http://localhost:3000](http://localhost:3000)
 
-
+Cosmic JS makes a great [Angular CMS](https://cosmicjs.com/knowledge-base/angularjs-cms) for your Angular apps.
